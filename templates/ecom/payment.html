@@ -1,0 +1,145 @@
+{% extends 'ecom/customer_base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var cardNumberInput = document.getElementById('cardNumber');
+            var expiryMonthInput = document.getElementById('expityMonth');
+            var expiryYearInput = document.getElementById('expityYear');
+
+            cardNumberInput.addEventListener('input', function() {
+                validateCardNumber();
+            });
+
+            expiryMonthInput.addEventListener('input', function() {
+                validateExpiryDate();
+            });
+
+            expiryYearInput.addEventListener('input', function() {
+                validateExpiryDate();
+            });
+        });
+
+        function validateCardNumber() {
+            var cardNumberInput = document.getElementById('cardNumber');
+            var cardNumber = cardNumberInput.value.replace(/\s/g, ''); // Remove any spaces
+            var errorMessage = document.getElementById('cardNumberError');
+            if (cardNumber.length !== 16) {
+                errorMessage.innerText = 'Invalid card number. Please enter a 16-digit card number.';
+                cardNumberInput.setCustomValidity('Invalid card number');
+            } else {
+                errorMessage.innerText = '';
+                cardNumberInput.setCustomValidity('');
+            }
+        }
+
+        function validateExpiryDate() {
+            var expiryMonthInput = document.getElementById('expityMonth');
+            var expiryYearInput = document.getElementById('expityYear');
+            var errorMessage = document.getElementById('expiryDateError');
+            var currentMonth = new Date().getMonth() + 1; // Adding 1 because getMonth() returns zero-based index
+            var currentYear = new Date().getFullYear();
+
+            var expiryMonth = parseInt(expiryMonthInput.value, 10);
+            var expiryYear = parseInt(expiryYearInput.value, 10);
+
+            if (expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)) {
+                errorMessage.innerText = 'Your card has expired. Please renew your card.';
+                expiryMonthInput.setCustomValidity('Card expired');
+                expiryYearInput.setCustomValidity('Card expired');
+            } else {
+                errorMessage.innerText = '';
+                expiryMonthInput.setCustomValidity('');
+                expiryYearInput.setCustomValidity('');
+            }
+        }
+    </script>
+</head>
+<style media="screen">
+
+.panel-title {display: inline;font-weight: bold;}
+.checkbox.pull-right { margin: 0; }
+.pl-ziro { padding-left: 0px; }
+</style>
+<br><br>
+<center><i>Payment Demo</i></center>
+<br><br>
+<div class="container" style="text-align:center; padding-left:300px;">
+    <div class="row">
+        <div class="col-xs-12 col-md-4" style="height:500px; width:600px;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Payment Details
+                    </h3>
+                    <div class="checkbox pull-right">
+                        <label>
+                            <input type="checkbox" />
+                            Remember
+                        </label>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form role="form" method="post" onsubmit="return validateCardAndExpiry();">
+                    <div class="form-group">
+                        <label for="cardNumber">
+                            CARD NUMBER</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cardNumber" placeholder="xxxx xxxx xxxx xxxx"
+                                required autofocus />
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        </div>
+                        <span id="cardNumberError" style="color: red;"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-md-4 pull-left">
+                            <div class="form-group">
+                                <label for="cvCode">
+                                    MONTH</label>
+                                
+                                    <input type="text" class="form-control" id="expityMonth" placeholder="MM - 02" required />
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-xs-4 col-md-4">
+                            <div class="form-group">
+                                <label for="expityMonth">
+                                    EXPIRY DATE</label>
+                               
+                                    <input type="text" class="form-control" id="expityYear" placeholder="YY - 22" required /></div>
+                                <span id="expiryDateError" style="color: red;"></span>
+                        </div>
+                        <div class="col-xs-4 col-md-4 pull-right">
+                            <div class="form-group">
+                                <label for="cvCode">
+                                    CV CODE</label>
+                                <input type="password" class="form-control" id="cvCode" placeholder="CV - xxx" required />
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a href="#"><span class="badge pull-right">{{total}}</span> Final Payment</a>
+                </li>
+            </ul>
+            <br/>
+            <a href="/payment-success" class="btn btn-success btn-lg btn-block" role="button">Pay</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateCardAndExpiry() {
+        validateCardNumber();
+        validateExpiryDate();
+        // Return false if any validation fails
+        return !document.getElementById('cardNumber').checkValidity() || !document.getElementById('expityMonth').checkValidity() || !document.getElementById('expityYear').checkValidity();
+    }
+</script>
+
+{% endblock content %}

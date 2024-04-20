@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>epharmacy</title>
+  <style media="screen">
+    .footer {
+      position: fixed;
+    }
+
+    .form-container {
+    border: 1px solid #ccc; /* Add border */
+    padding: 15px; /* Reduce padding */
+    width: 70%; /* Adjust width */
+    margin: 0 auto; /* Center horizontally */
+    display: flex; /* Use flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+
+
+
+  </style>
+</head>
+
+<body style="background-color:#f7f7f7;">
+  {% if request.user.is_authenticated %}
+    {% include "ecom/customer_navbar.html" %}
+  {% else %}
+    {% include "ecom/navbar.html" %}
+  {% endif %}
+  <br><br><br>
+  <h3 style="text-align:center;">
+    Welcome to ePharmacy: Your Convenient Online Pharmacy
+  </h3>
+  <br>
+  <p style="text-align:center;">
+    In today's fast-paced world, convenience is key. With ePharmacy, we bring the pharmacy experience right to your fingertips. Imagine being able to refill your prescriptions, purchase over-the-counter medications, and access healthcare products from the comfort of your own home, at any time of the day or night. That's the beauty of ePharmacy.
+  </p>
+  <br>
+  <p style="text-align:center;">
+    <strong>What Sets Us Apart?</strong>
+    <br>
+    <ol>
+      <li>Accessibility: Our platform is accessible 24/7, allowing you to shop for your healthcare needs whenever it's convenient for you. No more rushing to the pharmacy before closing time or waiting in long lines.</li>
+      <li>Wide Range of Products: From prescription medications to vitamins and supplements, we offer a comprehensive selection of healthcare products to cater to your needs.</li>
+      <li>Expert Advice: Have questions about a particular medication or need guidance on managing a health condition? Our team of pharmacists is here to provide expert advice and support.</li>
+      <li>Convenient Delivery Options: Say goodbye to the hassle of picking up prescriptions. We offer fast and reliable delivery straight to your doorstep, ensuring you never miss a dose.</li>
+      <li>Privacy and Security: We prioritize your privacy and security. Rest assured that your personal information and medical history are kept confidential and secure.</li>
+    </ol>
+  </p>
+
+
+
+  <!--<div class="container">
+
+    <div class="row">
+        <div class="col-md-6">
+            &nbsp;&nbsp; &nbsp;<center>
+              <h2>Query Form</h2><br>
+
+            <div class="form-container">
+              
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <label for="email">Your Email:</label>
+                    <input type="email" id="email" name="email" required>
+                    <br><br>
+                    <input type="submit" value="Submit" >
+                </form>
+           
+        </div>
+    </div>
+</div>-->
+<br><br><br><br><br><br><br><br><br>
+
+
+  {% include "ecom/footer.html" %}
+</body>
+
+
+</html>

@@ -1,0 +1,234 @@
+{% extends 'ecom/homebase.html' %}
+{% load static %}
+{% block content %}
+
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<style media="screen">
+  .button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 28px;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+.button2 {
+  background-color: white;
+  color: black;
+  border: 2px solid #008CBA;
+}
+
+.button2:hover {
+  background-color: #008CBA;
+  color: white;
+}
+.cart-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .cart-item .quantity {
+        margin: 0 10px;
+    }
+    .cart-item button {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    .text-danger{
+      color:red;
+    }
+</style>
+
+</head>
+
+<br><br><br><br>
+
+<div class="container">
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h6 style="text-align:center;" class="panel-title">My Cart</h6>
+    </div>
+    <table class="table table-hover table-bordered" id="dev-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total Price</th>
+          <th>Description</th>
+          <th>Action</th>
+
+        </tr>
+      </thead>
+      {% for p in products %}
+  {% if p %}
+
+      <tr>
+        <td> {{p.name}}</td>
+        <td> <img src="{% static p.product_image.url %}" alt="Profile Pic" height="50px" width="50px" /></td>
+        <td>₹ {{p.price}}</td>
+        <td>
+          <div class="cart-item">
+            <div class="cart-item">
+              <div class="product-info">
+                  <p>Available Quantity: <span class="available-quantity">{{p.stock}}</span></p>
+                  <button class="decrement-quantity" itemId="{{p.id}}" itemprice="{{p.price}}" productid="{{p.stock}}">-</button>
+                  <input type="text" class="quantity-input " size="4"  value="1" min="1">
+                  <button class="increment-quantity" itemId="{{p.id}}" itemprice="{{p.price}}" productid="{{p.stock}}">+</button>
+                  <!--<button class="update-quantity">Update Quantity</button>-->
+              </div>
+          </div>
+        </div>
+          <input type="hidden" id="ttl_qunty" value="{{p.stock}}">
+        <small class="text-danger " id="limit_exceed-{{p.stock}}"></small>
+
+        </td>
+        <td  id="ttl_price-{{p.id}}">{{p.price}}</td>
+        <td>{{p.description}}</td>
+
+        <td><a class="btn btn-danger btn-xs" href="{% url 'remove-from-cart' p.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td>
+
+      </tr>
+      {%else%}
+      <br><br><br>
+      <h1>no products</h1>
+      {% endif %}
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br><br><br>
+<div style="text-align: center;">
+  <button class="btn btn-danger btn-lg" id="grand_ttl" dbTtl="{{total}}">Total ₹{{total}}</button>
+  <a href="/customer-address"><button class="btn btn-success btn-lg" ><span>Purchase </span></button></a>
+</div>
+
+<script>
+  $(document).ready(function() {
+    var smallid="";
+    var priceid="";
+    var grandTTL=parseInt($('#grand_ttl').attr('dbTtl'));
+    //alert(grandTTL);
+        $(".increment-quantity").click(function() {
+            var $cartItem = $(this).closest(".cart-item");
+            var availableQuantity = parseInt($(this).attr('productid'));//$cartItem.find(".available-quantity").text());
+            var quantityInput = $cartItem.find(".quantity-input");
+            var currentQuantity = parseInt(quantityInput.val());
+            if (currentQuantity < availableQuantity) {
+                quantityInput.val(currentQuantity + 1);
+                var itemPrice=parseInt($(this).attr('itemprice'));
+                var itemid=parseInt($(this).attr('itemid'));
+                //alert("quantityInput: "+currentQuantity+"itemPrice: "+itemPrice)
+                priceid="ttl_price-"+itemid;
+                ttlPrice=itemPrice*(currentQuantity+1);
+                grandTTL+=itemPrice;
+                document.getElementById(priceid).innerHTML=ttlPrice;
+                document.getElementById('grand_ttl').innerHTML="Total ₹"+grandTTL;
+            } 
+            else if(availableQuantity==0) {
+              smallid="limit_exceed-"+availableQuantity;
+              document.getElementById(smallid).innerHTML="Error: Out of Stock.";
+            }
+            else {
+              smallid="limit_exceed-"+availableQuantity;
+              document.getElementById(smallid).innerHTML="Error: Quantity exceeds available quantity.";
+            }
+        });
+
+        $(".decrement-quantity").click(function() {
+            var $cartItem = $(this).closest(".cart-item");
+            var quantityInput = $cartItem.find(".quantity-input");
+            var currentQuantity = parseInt(quantityInput.val());
+
+            if (currentQuantity > 1) {
+                quantityInput.val(currentQuantity - 1);
+                var itemPrice=parseInt($(this).attr('itemprice'));
+                var itemid=parseInt($(this).attr('itemid'));
+                //alert("quantityInput: "+currentQuantity+"itemPrice: "+itemPrice)
+                priceid="ttl_price-"+itemid;
+                ttlPrice=itemPrice*(currentQuantity-1);
+                document.getElementById(priceid).innerHTML=ttlPrice;
+                grandTTL-=itemPrice;
+                //alert(grandTTL);
+                document.getElementById('grand_ttl').innerHTML="Total ₹"+grandTTL;
+                //alert("quantityInput: "+currentQuantity+"itemPrice: "+itemPrice+" ttlprice: "+ttlPrice);
+              //var smallid="limit_exceed-"+availableQuantity;
+                document.getElementById(smallid).innerHTML="";
+            }
+        });
+
+        /*$(".update-quantity").click(function() {
+            var $cartItem = $(this).closest(".cart-item");
+            var availableQuantity = parseInt($cartItem.find(".available-quantity").text());
+            var newQuantity = parseInt($cartItem.find(".quantity-input").val());
+
+            if (newQuantity > availableQuantity) {
+              document.getElementById('limit_exceed').innerHTML="Error: Quantity exceeds available quantity.";
+                return;
+            }
+
+            productId=$(this).attr('productid');
+            //alert(productId);
+            // Perform AJAX request to update quantity in database
+            // Example:
+             $.ajax({
+                 url: "update_quantity.php",
+                 method: "POST",
+                 data: {
+                    'productId': productId,
+                    'newQuantity': newQuantity
+                 },
+                 success: function(response) {
+                     // Handle success response
+                 },
+                 error: function(xhr, status, error) {
+                     console.error("AJAX Error: " + error);
+                 }
+             });
+
+            // For demonstration purpose, just update the available quantity displayed on the page
+            $cartItem.find(".available-quantity").text(availableQuantity - newQuantity);
+            alert("Quantity updated successfully.");
+        });*/
+    });
+</script>
+<br><br><br>
+
+{% endblock content %}
